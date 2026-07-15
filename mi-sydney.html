@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>觅 Mì — Sydney</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B1712;
+    --paper:#F7EFE1;
+    --paper-dim:#EFE4CE;
+    --red:#B23225;
+    --red-dark:#8B2419;
+    --jade:#2F6E5C;
+    --gold:#C79A3B;
+    --line: rgba(27,23,18,0.12);
+    --card: #FFFCF6;
+    --shadow: 0 10px 30px rgba(27,23,18,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Work Sans', sans-serif;
+    background: #DDD3BE;
+    color: var(--ink);
+    display:flex;
+    justify-content:center;
+    min-height:100vh;
+  }
+  .cjk{ font-family:'Noto Serif SC', serif; }
+
+  #app{
+    width:100%;
+    max-width:460px;
+    min-height:100vh;
+    background: var(--paper);
+    position:relative;
+    box-shadow: var(--shadow);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* ---------- Header ---------- */
+  header.top{
+    padding:18px 18px 12px;
+    background: var(--paper);
+    position:sticky; top:0; z-index:20;
+    border-bottom:1px solid var(--line);
+  }
+  .brandrow{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .seal{
+    width:38px; height:38px; border-radius:8px; background: var(--red);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-family:'Noto Serif SC', serif; font-weight:900; font-size:20px;
+    transform: rotate(-4deg);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+    flex-shrink:0;
+  }
+  .brandname{ line-height:1.1; }
+  .brandname .zh{ font-family:'Noto Serif SC',serif; font-weight:900; font-size:19px; letter-spacing:1px; }
+  .brandname .en{ font-size:10.5px; letter-spacing:3px; text-transform:uppercase; color:#6b6255; }
+  .searchbar{
+    display:flex; align-items:center; gap:8px;
+    background: var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:11px 14px;
+  }
+  .searchbar input{
+    border:none; outline:none; background:transparent; flex:1;
+    font-family:'Work Sans',sans-serif; font-size:14.5px; color:var(--ink);
+  }
+  .searchbar svg{ flex-shrink:0; opacity:0.55; }
+
+  .chiprow{ display:flex; gap:8px; overflow-x:auto; padding:12px 18px 2px; scrollbar-width:none; }
+  .chiprow::-webkit-scrollbar{display:none;}
+  .chip{
+    flex-shrink:0; padding:8px 15px; border-radius:999px; border:1px solid var(--line);
+    background: var(--card); font-size:13px; font-weight:600; cursor:pointer;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+    transition: all .15s ease;
+  }
+  .chip.active{ background: var(--red); color:#fff; border-color:var(--red); }
+
+  /* ---------- Scroll body ---------- */
+  main{ flex:1; overflow-y:auto; padding-bottom:86px; }
+  .section{ padding: 18px; }
+  .section-title{
+    display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px;
+  }
+  .section-title h2{ margin:0; font-size:16px; font-weight:700; }
+  .section-title .zh-tag{ font-family:'Noto Serif SC',serif; font-size:12px; color: var(--red); font-weight:700; }
+
+  .hlist{ display:flex; gap:12px; overflow-x:auto; padding-bottom:4px; margin:0 -18px; padding-left:18px; padding-right:18px; scrollbar-width:none;}
+  .hlist::-webkit-scrollbar{display:none;}
+
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .card{
+    background: var(--card); border:1px solid var(--line); border-radius:14px;
+    overflow:hidden; cursor:pointer; transition: transform .12s ease;
+    display:flex; flex-direction:column;
+  }
+  .card:active{ transform: scale(0.98); }
+  .card.wide{ flex-shrink:0; width:180px; }
+  .thumb{
+    height:96px; display:flex; align-items:center; justify-content:center;
+    font-size:34px; position:relative;
+  }
+  .thumb .catmark{
+    position:absolute; top:6px; left:6px; background:rgba(0,0,0,0.35); color:#fff;
+    font-size:9px; padding:2px 7px; border-radius:999px; letter-spacing:0.5px; text-transform:uppercase; font-weight:600;
+  }
+  .thumb .heart{
+    position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%;
+    background:rgba(255,255,255,0.85); display:flex; align-items:center; justify-content:center; font-size:13px;
+  }
+  .cinfo{ padding:10px 11px 12px; }
+  .cinfo .name{ font-weight:700; font-size:13.5px; line-height:1.25; margin-bottom:3px; }
+  .cinfo .sub{ font-size:11.5px; color:#7a7163; margin-bottom:6px; }
+  .ratingrow{ display:flex; align-items:center; gap:6px; font-size:12px; }
+  .stars{ color: var(--gold); letter-spacing:1px; font-size:11px; }
+  .ratingnum{ font-family:'JetBrains Mono',monospace; font-weight:600; color: var(--jade); }
+  .pricelvl{ color:#8a8074; font-family:'JetBrains Mono',monospace; }
+
+  /* ---------- Bottom nav ---------- */
+  nav.bottom{
+    position:absolute; bottom:0; left:0; right:0; height:70px;
+    background: var(--card); border-top:1px solid var(--line);
+    display:flex; z-index:30;
+  }
+  .navbtn{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:3px; cursor:pointer; color:#9a8f7d; font-size:10px; font-weight:600;
+  }
+  .navbtn .ic{ font-size:19px; }
+  .navbtn.active{ color: var(--red); }
+
+  /* ---------- Detail overlay ---------- */
+  #detail{
+    position:absolute; inset:0; background: var(--paper); z-index:50;
+    display:none; flex-direction:column; overflow-y:auto;
+  }
+  #detail.open{ display:flex; }
+  .dethero{
+    height:190px; display:flex; align-items:center; justify-content:center; font-size:64px;
+    position:relative; flex-shrink:0;
+  }
+  .backbtn{
+    position:absolute; top:14px; left:14px; width:34px; height:34px; border-radius:50%;
+    background:rgba(255,255,255,0.9); display:flex; align-items:center; justify-content:center; cursor:pointer;
+    font-size:16px; z-index:5;
+  }
+  .detheart{
+    position:absolute; top:14px; right:14px; width:34px; height:34px; border-radius:50%;
+    background:rgba(255,255,255,0.9); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
+  }
+  .detbody{ padding:20px; }
+  .detbody h1{ margin:0 0 4px; font-size:22px; font-weight:700; }
+  .detbody .zhname{ font-family:'Noto Serif SC',serif; color:var(--red); font-weight:700; font-size:14px; margin-bottom:10px;}
+  .metarow{ display:flex; align-items:center; gap:10px; margin-bottom:14px; font-size:13px; color:#6b6255; flex-wrap:wrap;}
+  .metarow .rateblock{ display:flex; align-items:center; gap:6px; background:var(--card); padding:5px 10px; border-radius:8px; border:1px solid var(--line); }
+  .taglist{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+  .tag{ font-size:11px; padding:4px 10px; border-radius:999px; background: var(--paper-dim); color:#6b6255; font-weight:600; }
+  .desc{ font-size:14px; line-height:1.6; color:#3a342b; margin-bottom:18px; }
+  .addrbox{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-size:13px; margin-bottom:20px; display:flex; gap:10px; align-items:flex-start;}
+
+  .divider{ height:1px; background:var(--line); margin: 18px 0; }
+  .revheader{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .writebtn{ background:var(--red); color:#fff; border:none; padding:8px 14px; border-radius:999px; font-size:12.5px; font-weight:700; cursor:pointer; }
+  .review{ padding:14px 0; border-bottom:1px solid var(--line); }
+  .review:last-child{ border-bottom:none; }
+  .revtop{ display:flex; justify-content:space-between; margin-bottom:4px; }
+  .revuser{ font-weight:700; font-size:13px; }
+  .revdate{ font-size:11px; color:#9a8f7d; }
+  .revtext{ font-size:13.5px; line-height:1.5; color:#3a342b; }
+  .empty{ font-size:13px; color:#9a8f7d; padding:16px 0; text-align:center; }
+
+  /* ---------- Modal ---------- */
+  .modalwrap{
+    position:absolute; inset:0; background:rgba(27,23,18,0.5); z-index:80;
+    display:none; align-items:flex-end;
+  }
+  .modalwrap.open{ display:flex; }
+  .modal{
+    background: var(--paper); width:100%; border-radius:20px 20px 0 0; padding:22px;
+    max-height:85vh; overflow-y:auto;
+  }
+  .modal h3{ margin:0 0 16px; font-size:17px; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12px; font-weight:700; color:#6b6255; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;}
+  .field input, .field textarea{
+    width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 13px; font-family:'Work Sans',sans-serif;
+    font-size:14px; background:var(--card); resize:vertical;
+  }
+  .starpicker{ display:flex; gap:8px; font-size:26px; cursor:pointer; }
+  .starpicker span{ opacity:0.3; }
+  .starpicker span.on{ opacity:1; }
+  .modalbtns{ display:flex; gap:10px; margin-top:6px; }
+  .btn{ flex:1; padding:12px; border-radius:10px; font-weight:700; font-size:13.5px; border:none; cursor:pointer; }
+  .btn.primary{ background: var(--red); color:#fff; }
+  .btn.ghost{ background:var(--card); color:var(--ink); border:1px solid var(--line); }
+
+  /* ---------- Onboarding ---------- */
+  #onboard{
+    position:absolute; inset:0; background: var(--red); z-index:100;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px;
+    color:#fff; text-align:center;
+  }
+  #onboard .seal{ background:#fff; color:var(--red); width:64px; height:64px; font-size:32px; margin-bottom:22px;}
+  #onboard h1{ font-family:'Noto Serif SC',serif; font-size:28px; margin:0 0 6px; }
+  #onboard p{ opacity:0.85; font-size:13.5px; margin:0 0 26px; line-height:1.5; }
+  #onboard input{
+    width:100%; padding:13px 16px; border-radius:10px; border:none; margin-bottom:12px; font-size:14px;
+    font-family:'Work Sans',sans-serif;
+  }
+  #onboard .btn{ width:100%; background:#fff; color:var(--red); }
+
+  /* profile */
+  .profcard{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px; text-align:center; margin-bottom:18px;}
+  .profcard .seal{ margin:0 auto 12px; }
+  .statrow{ display:flex; justify-content:center; gap:24px; margin-top:16px; }
+  .statrow div{ text-align:center; }
+  .statrow .n{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:18px; color:var(--jade);}
+  .statrow .l{ font-size:10px; color:#9a8f7d; text-transform:uppercase; letter-spacing:0.5px;}
+
+  .toast{
+    position:absolute; bottom:90px; left:50%; transform:translateX(-50%);
+    background: var(--ink); color:#fff; padding:10px 18px; border-radius:999px; font-size:12.5px;
+    z-index:120; opacity:0; pointer-events:none; transition: opacity .25s ease, bottom .25s ease;
+  }
+  .toast.show{ opacity:1; bottom:100px; }
+
+  .note{ font-size:11px; color:#9a8f7d; text-align:center; padding:10px 30px 0; line-height:1.5; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="onboard">
+    <div class="seal cjk">觅</div>
+    <h1 class="cjk">觅 Mì</h1>
+    <p>Find your next spot in Sydney — food, sights, shopping &amp; more. Tell us what to call you.</p>
+    <input id="nameInput" placeholder="Your display name" maxlength="24" />
+    <button class="btn" id="startBtn">Enter 进入</button>
+  </div>
+
+  <header class="top">
+    <div class="brandrow">
+      <div class="seal cjk">觅</div>
+      <div class="brandname">
+        <div class="zh cjk">觅 Mì</div>
+        <div class="en">Sydney Discovery</div>
+      </div>
+    </div>
+    <div class="searchbar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" placeholder="Search spots, areas, tags..." />
+    </div>
+    <div class="chiprow" id="chipRow"></div>
+  </header>
+
+  <main id="main"></main>
+
+  <div id="detail">
+    <div class="backbtn" id="backBtn">←</div>
+    <div class="detheart" id="detHeart">♡</div>
+    <div class="dethero" id="detHero"></div>
+    <div class="detbody" id="detBody"></div>
+  </div>
+
+  <div class="modalwrap" id="reviewModalWrap">
+    <div class="modal">
+      <h3 class="cjk">写点评 Write a review</h3>
+      <div class="field">
+        <label>Your rating</label>
+        <div class="starpicker" id="starPicker">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Review</label>
+        <textarea id="reviewText" rows="4" placeholder="What was it like?"></textarea>
+      </div>
+      <div class="modalbtns">
+        <button class="btn ghost" id="cancelReview">Cancel</button>
+        <button class="btn primary" id="submitReview">Post review</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <nav class="bottom">
+    <div class="navbtn active" data-tab="discover"><div class="ic">🧭</div>发现 Discover</div>
+    <div class="navbtn" data-tab="categories"><div class="ic">🗂️</div>分类 Browse</div>
+    <div class="navbtn" data-tab="saved"><div class="ic">♡</div>收藏 Saved</div>
+    <div class="navbtn" data-tab="profile"><div class="ic">👤</div>我的 Profile</div>
+  </nav>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const CATS = {
+  food: {label:"Food", zh:"美食", emoji:"🍜", color:"#F3D9C4"},
+  attractions: {label:"Attractions", zh:"景点", emoji:"🏛️", color:"#D7E4DC"},
+  shopping: {label:"Shopping", zh:"购物", emoji:"🛍️", color:"#E9DCEF"},
+  services: {label:"Services", zh:"服务", emoji:"🧖", color:"#DCE6EF"},
+};
+
+const SPOTS = [
+  // FOOD
+  {id:"bennelong", name:"Bennelong", zh:"贝尼朗", category:"food", emoji:"🦪", neighborhood:"Circular Quay", address:"Sydney Opera House, Bennelong Point", price:3, base:4.6, seed:210, tags:["Fine dining","Australian","Harbour view"], desc:"Peter Gilmore's fine diner inside the sails of the Sydney Opera House, serving refined modern Australian food with a whimsical dessert menu drawing on traditional Aussie sweets."},
+  {id:"saintpeter", name:"Saint Peter", zh:"圣彼得", category:"food", emoji:"🐟", neighborhood:"Paddington", address:"Grand National Hotel, Paddington", price:3, base:4.7, seed:180, tags:["Seafood","Fine dining","Chef-driven"], desc:"Josh Niland's whole-fish seafood restaurant, celebrated worldwide for nose-to-tail fish cookery and a 20-seat bar plus dining room."},
+  {id:"goldencentury", name:"Golden Century", zh:"金唐酒家", category:"food", emoji:"🦞", neighborhood:"Chinatown", address:"393-399 Sussex St, Haymarket", price:2, base:4.4, seed:640, tags:["Cantonese","Seafood","Late night"], desc:"A Chinatown institution since the 90s — live seafood tanks, steamed mud crab and late-night banquets that keep the CBD's chefs coming back after their own shifts end."},
+  {id:"chatthai", name:"Chat Thai", zh:"泰式茶餐", category:"food", emoji:"🌶️", neighborhood:"Thaitown / Haymarket", address:"20 Campbell St, Haymarket", price:1, base:4.3, seed:520, tags:["Thai","Casual","Thaitown"], desc:"A Thaitown mainstay serving boat noodles, som tum and Thai iced tea — the anchor of Sydney's Campbell Street Thai strip."},
+  {id:"bourkestreetbakery", name:"Bourke Street Bakery", zh:"波克街面包房", category:"food", emoji:"🥐", neighborhood:"Surry Hills", address:"633 Bourke St, Surry Hills", price:1, base:4.5, seed:390, tags:["Bakery","Pastry","Breakfast"], desc:"The sausage roll and ginger brulee tart that launched a small empire — still baked fresh daily at the original Surry Hills shopfront."},
+  {id:"mrwong", name:"Mr Wong", zh:"黄先生", category:"food", emoji:"🥟", neighborhood:"CBD", address:"3 Bridge Ln, Sydney CBD", price:2, base:4.4, seed:710, tags:["Chinese","Yum cha","Buzzy"], desc:"A soaring, plant-filled Cantonese dining room in a heritage laneway building — Peking duck, trolley-service dumplings and a lively bar."},
+
+  // ATTRACTIONS
+  {id:"operahouse", name:"Sydney Opera House", zh:"悉尼歌剧院", category:"attractions", emoji:"⛵", neighborhood:"Circular Quay", address:"Bennelong Point, Sydney", price:0, base:4.8, seed:2400, tags:["Icon","Harbour","Tours"], desc:"Jørn Utzon's sail-roofed masterpiece on Bennelong Point — take a guided architecture tour or catch a performance inside."},
+  {id:"harbourbridge", name:"Sydney Harbour Bridge", zh:"悉尼海港大桥", category:"attractions", emoji:"🌉", neighborhood:"The Rocks / Milsons Point", address:"Sydney Harbour Bridge", price:0, base:4.8, seed:1900, tags:["Icon","BridgeClimb","Views"], desc:"The 'Coathanger' — walk the pedestrian lane for free, or book a BridgeClimb to the very top of the arch for 360° harbour views."},
+  {id:"bondibeach", name:"Bondi Beach", zh:"邦迪海滩", category:"attractions", emoji:"🏖️", neighborhood:"Bondi", address:"Queen Elizabeth Dr, Bondi Beach", price:0, base:4.6, seed:2100, tags:["Beach","Surf","Coastal walk"], desc:"Sydney's most famous beach — surf, swim at the iconic Icebergs pool, or walk the coastal path to Coogee."},
+  {id:"taronga", name:"Taronga Zoo", zh:"塔龙加动物园", category:"attractions", emoji:"🦁", neighborhood:"Mosman", address:"Bradleys Head Rd, Mosman", price:2, base:4.5, seed:980, tags:["Zoo","Family","Ferry"], desc:"A harbourside zoo reached by ferry from Circular Quay, with sweeping views back over the water to the city skyline."},
+  {id:"botanicgarden", name:"Royal Botanic Garden", zh:"皇家植物园", category:"attractions", emoji:"🌿", neighborhood:"CBD / Domain", address:"Mrs Macquaries Rd, Sydney", price:0, base:4.7, seed:1300, tags:["Gardens","Free","Walk"], desc:"Sprawling harbourside gardens between the Opera House and the CBD — a favourite spot for a picnic or the walk out to Mrs Macquarie's Chair."},
+  {id:"darlingharbour", name:"Darling Harbour", zh:"达令港", category:"attractions", emoji:"🎡", neighborhood:"Darling Harbour", address:"Darling Harbour, Sydney", price:0, base:4.3, seed:1550, tags:["Waterfront","Family","Aquarium"], desc:"A lively waterfront precinct with SEA LIFE Aquarium, restaurants, and regular fireworks over the water."},
+
+  // SHOPPING
+  {id:"qvb", name:"Queen Victoria Building", zh:"维多利亚女王大厦", category:"shopping", emoji:"🏰", neighborhood:"CBD", address:"455 George St, Sydney", price:2, base:4.6, seed:860, tags:["Heritage","Boutiques","CBD"], desc:"A magnificently restored 1898 Romanesque building filled with boutiques, cafes, and a hand-carved Royal Clock — a shopping trip that doubles as sightseeing."},
+  {id:"pittstmall", name:"Pitt Street Mall", zh:"皮特街购物区", category:"shopping", emoji:"🛍️", neighborhood:"CBD", address:"Pitt St, Sydney CBD", price:2, base:4.3, seed:640, tags:["High street","Flagships"], desc:"Sydney's main pedestrian shopping strip, anchored by Westfield Sydney and flagship stores from local and international brands."},
+  {id:"westfieldsydney", name:"Westfield Sydney", zh:"悉尼西田", category:"shopping", emoji:"🏬", neighborhood:"CBD", address:"188 Pitt St, Sydney", price:2, base:4.4, seed:1100, tags:["Mall","Dining","Luxury"], desc:"A vertical mall beneath Sydney Tower with luxury flagships, a large dining level, and direct access to the Pitt Street Mall strip."},
+  {id:"paddysmarket", name:"Paddy's Markets", zh:"派迪市场", category:"shopping", emoji:"🧺", neighborhood:"Haymarket", address:"9-13 Hay St, Haymarket", price:1, base:4.0, seed:520, tags:["Markets","Bargains","Chinatown"], desc:"A sprawling indoor market on the edge of Chinatown for produce, souvenirs, flowers and bargain finds since 1834."},
+  {id:"therocksmarket", name:"The Rocks Markets", zh:"岩石区市集", category:"shopping", emoji:"🎨", neighborhood:"The Rocks", address:"George St, The Rocks", price:2, base:4.3, seed:410, tags:["Weekend","Craft","Harbourside"], desc:"Weekend stalls of local design, art and street food under the Harbour Bridge approach in Sydney's oldest quarter."},
+  {id:"paddingtonmarket", name:"Paddington Markets", zh:"帕丁顿市集", category:"shopping", emoji:"👗", neighborhood:"Paddington", address:"395 Oxford St, Paddington", price:2, base:4.4, seed:360, tags:["Saturday only","Fashion","Indie"], desc:"A Saturday institution since 1973 — emerging designers, vintage racks and jewellery stalls in a leafy churchyard on Oxford Street."},
+
+  // SERVICES  (representative sample listings)
+  {id:"chinatownmassage", name:"Chinatown Foot Massage House", zh:"唐人街足浴", category:"services", emoji:"💆", neighborhood:"Chinatown", address:"Dixon St, Haymarket", price:1, base:4.2, seed:140, tags:["Massage","Walk-in","Chinatown"], desc:"Sample listing — a typical Dixon Street foot & body massage studio; walk-ins welcome, popular after a big Chinatown dinner."},
+  {id:"bondisurf", name:"Bondi Surf School", zh:"邦迪冲浪学校", category:"services", emoji:"🏄", neighborhood:"Bondi", address:"Bondi Beach", price:2, base:4.6, seed:260, tags:["Lessons","Beginner friendly"], desc:"Sample listing — representative of the group surf lesson operators that run out of Bondi Beach every morning."},
+  {id:"cbdhairstudio", name:"CBD Hair Studio", zh:"市中心发廊", category:"services", emoji:"💇", neighborhood:"CBD", address:"George St, Sydney CBD", price:2, base:4.3, seed:190, tags:["Hair","Colour","Book ahead"], desc:"Sample listing — representative of the many hair studios tucked into Sydney's CBD laneways."},
+  {id:"manlybike", name:"Manly Bike Hire", zh:"曼利自行车租赁", category:"services", emoji:"🚲", neighborhood:"Manly", address:"The Corso, Manly", price:1, base:4.4, seed:95, tags:["Rental","Beachside"], desc:"Sample listing — representative bike hire near Manly's Corso, handy for the coastal path to Shelly Beach."},
+  {id:"pyrmontyoga", name:"Pyrmont Yoga Studio", zh:"派蒙瑜伽馆", category:"services", emoji:"🧘", neighborhood:"Pyrmont", address:"Harris St, Pyrmont", price:2, base:4.5, seed:120, tags:["Yoga","Drop-in classes"], desc:"Sample listing — representative boutique yoga studio serving the Pyrmont/Darling Harbour apartment crowd."},
+  {id:"opentours", name:"Sydney Opera House Guided Tours", zh:"歌剧院导览", category:"services", emoji:"🎟️", neighborhood:"Circular Quay", address:"Sydney Opera House", price:2, base:4.7, seed:800, tags:["Guided tour","Booking required"], desc:"Official front-of-house and backstage architecture tours of the Opera House — book ahead, tours run daily."},
+];
+
+/* ================= STATE ================= */
+let state = {
+  tab: "discover",
+  category: "all",
+  search: "",
+  currentSpotId: null,
+  user: null,
+  favorites: [],
+  reviewsCache: {},   // spotId -> array
+  pendingStars: 0,
+};
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+function toast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1800);
+}
+
+/* ================= STORAGE HELPERS ================= */
+async function loadProfile(){
+  try{
+    const r = await window.storage.get("profile", false);
+    return r ? JSON.parse(r.value) : null;
+  }catch(e){ return null; }
+}
+async function saveProfile(p){
+  try{ await window.storage.set("profile", JSON.stringify(p), false); }catch(e){}
+}
+async function loadFavorites(){
+  try{
+    const r = await window.storage.get("favorites", false);
+    return r ? JSON.parse(r.value) : [];
+  }catch(e){ return []; }
+}
+async function saveFavorites(list){
+  try{ await window.storage.set("favorites", JSON.stringify(list), false); }catch(e){}
+}
+async function loadReviews(spotId){
+  if(state.reviewsCache[spotId]) return state.reviewsCache[spotId];
+  try{
+    const r = await window.storage.get("reviews:"+spotId, true);
+    const arr = r ? JSON.parse(r.value) : [];
+    state.reviewsCache[spotId] = arr;
+    return arr;
+  }catch(e){
+    state.reviewsCache[spotId] = [];
+    return [];
+  }
+}
+async function saveReviews(spotId, arr){
+  state.reviewsCache[spotId] = arr;
+  try{ await window.storage.set("reviews:"+spotId, JSON.stringify(arr), true); }catch(e){}
+}
+
+/* ================= RATING CALC ================= */
+function displayRating(spot, reviews){
+  const seedWeight = 25; // treat base rating as if backed by this many reviews
+  let total = spot.base * seedWeight;
+  let count = seedWeight;
+  (reviews||[]).forEach(r=>{ total += r.rating; count += 1; });
+  return Math.round((total/count) * 10) / 10;
+}
+function starString(rating){
+  const full = Math.round(rating);
+  return "★".repeat(full) + "☆".repeat(5-full);
+}
+function priceStr(level){
+  if(level === 0) return "Free";
+  return "$".repeat(level);
+}
+
+/* ================= RENDER: CARDS ================= */
+function cardHTML(spot, reviews, wide){
+  const rating = displayRating(spot, reviews);
+  const cat = CATS[spot.category];
+  const fav = state.favorites.includes(spot.id);
+  return `
+  <div class="card ${wide?'wide':''}" data-id="${spot.id}">
+    <div class="thumb" style="background:${cat.color}">
+      <span class="catmark">${cat.zh} ${cat.label}</span>
+      <span class="heart" data-heart="${spot.id}">${fav?'♥':'♡'}</span>
+      ${spot.emoji}
+    </div>
+    <div class="cinfo">
+      <div class="name">${spot.name}</div>
+      <div class="sub">${spot.neighborhood}</div>
+      <div class="ratingrow">
+        <span class="stars">${starString(rating)}</span>
+        <span class="ratingnum">${rating}</span>
+        <span class="pricelvl">${priceStr(spot.price)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function renderCardsInto(container, spots, wide){
+  container.innerHTML = spots.map(s => cardHTML(s, state.reviewsCache[s.id], wide)).join("");
+  // lazy-refresh ratings with actual review data
+  for(const s of spots){
+    loadReviews(s.id).then(rv=>{
+      const el = container.querySelector(`.card[data-id="${s.id}"]`);
+      if(el){
+        const rating = displayRating(s, rv);
+        el.querySelector(".stars").textContent = starString(rating);
+        el.querySelector(".ratingnum").textContent = rating;
+      }
+    });
+  }
+}
+
+/* ================= MAIN VIEWS ================= */
+function filteredSpots(){
+  let list = SPOTS;
+  if(state.category !== "all") list = list.filter(s=>s.category===state.category);
+  if(state.search.trim()){
+    const q = state.search.trim().toLowerCase();
+    list = list.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.neighborhood.toLowerCase().includes(q) ||
+      s.tags.some(t=>t.toLowerCase().includes(q)) ||
+      CATS[s.category].label.toLowerCase().includes(q)
+    );
+  }
+  return list;
+}
+
+async function renderDiscover(){
+  const main = $("#main");
+  const searching = state.search.trim().length > 0 || state.category !== "all";
+
+  if(searching){
+    const list = filteredSpots();
+    main.innerHTML = `
+      <div class="section">
+        <div class="section-title"><h2>${list.length} result${list.length!==1?'s':''}</h2><span class="zh-tag">结果</span></div>
+        <div class="grid" id="resultsGrid"></div>
+      </div>`;
+    renderCardsInto($("#resultsGrid"), list, false);
+    return;
+  }
+
+  const top = [...SPOTS].sort((a,b)=>b.base-a.base).slice(0,6);
+
+  let html = `
+    <div class="section" style="padding-bottom:6px;">
+      <div class="section-title"><h2>Trending now</h2><span class="zh-tag">热门</span></div>
+      <div class="hlist" id="trendList"></div>
+    </div>`;
+
+  Object.keys(CATS).forEach(catKey=>{
+    html += `
+    <div class="section" style="padding-top:6px;">
+      <div class="section-title"><h2>${CATS[catKey].label}</h2><span class="zh-tag">${CATS[catKey].zh}</span></div>
+      <div class="hlist" id="cat-${catKey}"></div>
+    </div>`;
+  });
+  html += `<div class="note">Food &amp; attractions data reflects real, well-known Sydney venues. Services listings are representative sample entries. Ratings blend a starting community score with reviews posted in this app.</div>`;
+
+  main.innerHTML = html;
+  renderCardsInto($("#trendList"), top, true);
+  Object.keys(CATS).forEach(catKey=>{
+    const spots = SPOTS.filter(s=>s.category===catKey).slice(0,6);
+    renderCardsInto($("#cat-"+catKey), spots, true);
+  });
+}
+
+function renderCategories(){
+  const main = $("#main");
+  let html = `<div class="section"><div class="section-title"><h2>Browse all categories</h2><span class="zh-tag">分类浏览</span></div></div>`;
+  Object.keys(CATS).forEach(catKey=>{
+    const cat = CATS[catKey];
+    const spots = SPOTS.filter(s=>s.category===catKey);
+    html += `
+    <div class="section" style="padding-top:0;">
+      <div class="section-title"><h2>${cat.emoji} ${cat.label}</h2><span class="zh-tag">${cat.zh}</span></div>
+      <div class="grid" id="browse-${catKey}"></div>
+    </div>`;
+  });
+  main.innerHTML = html;
+  Object.keys(CATS).forEach(catKey=>{
+    const spots = SPOTS.filter(s=>s.category===catKey);
+    renderCardsInto($("#browse-"+catKey), spots, false);
+  });
+}
+
+async function renderSaved(){
+  const main = $("#main");
+  const favs = SPOTS.filter(s=>state.favorites.includes(s.id));
+  if(favs.length===0){
+    main.innerHTML = `<div class="section"><div class="empty">No saved spots yet.<br>Tap the ♡ on any card to save it here.</div></div>`;
+    return;
+  }
+  main.innerHTML = `
+    <div class="section">
+      <div class="section-title"><h2>Your saved spots</h2><span class="zh-tag">我的收藏</span></div>
+      <div class="grid" id="savedGrid"></div>
+    </div>`;
+  renderCardsInto($("#savedGrid"), favs, false);
+}
+
+async function renderProfile(){
+  const main = $("#main");
+  const totalReviews = await countUserReviews();
+  main.innerHTML = `
+    <div class="section">
+      <div class="profcard">
+        <div class="seal cjk">${(state.user||"?").charAt(0).toUpperCase()}</div>
+        <div style="font-weight:700; font-size:16px;">${state.user}</div>
+        <div style="font-size:12px; color:#9a8f7d; margin-top:4px;">觅 Mì member</div>
+        <div class="statrow">
+          <div><div class="n">${state.favorites.length}</div><div class="l">Saved</div></div>
+          <div><div class="n">${totalReviews}</div><div class="l">Reviews</div></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Display name</label>
+        <input id="renameInput" value="${state.user}" />
+      </div>
+      <button class="btn primary" id="saveNameBtn" style="width:100%;">Save changes</button>
+    </div>
+  `;
+  $("#saveNameBtn").addEventListener("click", async ()=>{
+    const v = $("#renameInput").value.trim();
+    if(v){ state.user = v; await saveProfile({name:v}); toast("Name updated"); render(); }
+  });
+}
+
+async function countUserReviews(){
+  let count = 0;
+  for(const s of SPOTS){
+    const rv = await loadReviews(s.id);
+    count += rv.filter(r=>r.user===state.user).length;
+  }
+  return count;
+}
+
+/* ================= DETAIL VIEW ================= */
+async function openDetail(id){
+  state.currentSpotId = id;
+  const spot = SPOTS.find(s=>s.id===id);
+  const cat = CATS[spot.category];
+  $("#detHero").style.background = cat.color;
+  $("#detHero").textContent = spot.emoji;
+  $("#detHeart").textContent = state.favorites.includes(id) ? "♥" : "♡";
+
+  const reviews = await loadReviews(id);
+  const rating = displayRating(spot, reviews);
+
+  $("#detBody").innerHTML = `
+    <h1>${spot.name}</h1>
+    <div class="zhname cjk">${spot.zh}</div>
+    <div class="metarow">
+      <div class="rateblock"><span class="stars">${starString(rating)}</span><span class="ratingnum">${rating}</span></div>
+      <span>${cat.emoji} ${cat.label}</span>
+      <span>${priceStr(spot.price)}</span>
+      <span>${spot.neighborhood}</span>
+    </div>
+    <div class="taglist">${spot.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+    <div class="desc">${spot.desc}</div>
+    <div class="addrbox">📍 <span>${spot.address}</span></div>
+    <div class="divider"></div>
+    <div class="revheader">
+      <div class="section-title" style="margin:0;"><h2 style="font-size:15px;">Reviews (${reviews.length})</h2></div>
+      <button class="writebtn" id="openReviewBtn">Write a review</button>
+    </div>
+    <div id="reviewsList">
+      ${reviews.length===0 ? `<div class="empty">No reviews yet — be the first to share your take.</div>` :
+        reviews.slice().reverse().map(r=>`
+          <div class="review">
+            <div class="revtop"><span class="revuser">${r.user}</span><span class="revdate">${r.date}</span></div>
+            <div class="stars" style="margin-bottom:4px;">${starString(r.rating)}</div>
+            <div class="revtext">${escapeHtml(r.text)}</div>
+          </div>`).join("")}
+    </div>
+  `;
+  $("#openReviewBtn").addEventListener("click", openReviewModal);
+  $("#detail").classList.add("open");
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function closeDetail(){
+  $("#detail").classList.remove("open");
+  state.currentSpotId = null;
+}
+
+/* ================= REVIEW MODAL ================= */
+function openReviewModal(){
+  state.pendingStars = 0;
+  updateStarPicker();
+  $("#reviewText").value = "";
+  $("#reviewModalWrap").classList.add("open");
+}
+function closeReviewModal(){
+  $("#reviewModalWrap").classList.remove("open");
+}
+function updateStarPicker(){
+  $$("#starPicker span").forEach(el=>{
+    el.classList.toggle("on", parseInt(el.dataset.v) <= state.pendingStars);
+  });
+}
+
+async function submitReview(){
+  if(state.pendingStars === 0){ toast("Pick a star rating first"); return; }
+  const text = $("#reviewText").value.trim();
+  if(!text){ toast("Write a few words first"); return; }
+  const id = state.currentSpotId;
+  const reviews = await loadReviews(id);
+  const today = new Date();
+  const dateStr = today.toISOString().slice(0,10);
+  reviews.push({user: state.user, rating: state.pendingStars, text, date: dateStr});
+  await saveReviews(id, reviews);
+  closeReviewModal();
+  toast("Review posted");
+  openDetail(id);
+}
+
+/* ================= FAVORITES ================= */
+async function toggleFavorite(id){
+  const idx = state.favorites.indexOf(id);
+  if(idx >= 0) state.favorites.splice(idx,1);
+  else state.favorites.push(id);
+  await saveFavorites(state.favorites);
+  toast(idx >= 0 ? "Removed from saved" : "Saved");
+  // refresh visible hearts
+  $$(`[data-heart="${id}"]`).forEach(el=> el.textContent = state.favorites.includes(id) ? "♥" : "♡");
+  if(state.currentSpotId === id) $("#detHeart").textContent = state.favorites.includes(id) ? "♥" : "♡";
+  if(state.tab === "saved") renderSaved();
+}
+
+/* ================= NAV / RENDER DISPATCH ================= */
+async function render(){
+  $$(".navbtn").forEach(b=> b.classList.toggle("active", b.dataset.tab === state.tab));
+  if(state.tab === "discover") await renderDiscover();
+  else if(state.tab === "categories") await renderCategories();
+  else if(state.tab === "saved") await renderSaved();
+  else if(state.tab === "profile") await renderProfile();
+}
+
+function renderChips(){
+  const all = [{key:"all", label:"All", zh:"全部", emoji:"✨"}, ...Object.keys(CATS).map(k=>({key:k, ...CATS[k]}))];
+  $("#chipRow").innerHTML = all.map(c=>`
+    <div class="chip ${state.category===c.key?'active':''}" data-cat="${c.key}">${c.emoji||''} ${c.label}</div>
+  `).join("");
+}
+
+/* ================= EVENT WIRING ================= */
+document.addEventListener("click", (e)=>{
+  const card = e.target.closest(".card");
+  const heart = e.target.closest("[data-heart]");
+  const chip = e.target.closest(".chip");
+  const navbtn = e.target.closest(".navbtn");
+  const star = e.target.closest("#starPicker span");
+
+  if(heart){
+    e.stopPropagation();
+    toggleFavorite(heart.dataset.heart);
+    return;
+  }
+  if(card){
+    openDetail(card.dataset.id);
+    return;
+  }
+  if(chip){
+    state.category = chip.dataset.cat;
+    renderChips();
+    render();
+    return;
+  }
+  if(navbtn){
+    state.tab = navbtn.dataset.tab;
+    state.category = "all";
+    state.search = "";
+    $("#searchInput").value = "";
+    renderChips();
+    render();
+    return;
+  }
+  if(star){
+    state.pendingStars = parseInt(star.dataset.v);
+    updateStarPicker();
+    return;
+  }
+});
+
+$("#backBtn").addEventListener("click", closeDetail);
+$("#detHeart").addEventListener("click", ()=> toggleFavorite(state.currentSpotId));
+$("#cancelReview").addEventListener("click", closeReviewModal);
+$("#submitReview").addEventListener("click", submitReview);
+
+let searchDebounce;
+$("#searchInput").addEventListener("input", (e)=>{
+  state.search = e.target.value;
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(()=>{ if(state.tab!=="discover"){ state.tab="discover"; renderChips(); } render(); }, 200);
+});
+
+$("#startBtn").addEventListener("click", async ()=>{
+  const v = $("#nameInput").value.trim();
+  const name = v || ("Guest" + Math.floor(Math.random()*900+100));
+  state.user = name;
+  await saveProfile({name});
+  $("#onboard").style.display = "none";
+  init2();
+});
+$("#nameInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("#startBtn").click(); });
+
+/* ================= INIT ================= */
+async function init(){
+  renderChips();
+  const profile = await loadProfile();
+  if(profile && profile.name){
+    state.user = profile.name;
+    $("#onboard").style.display = "none";
+    init2();
+  }
+  // onboard stays visible otherwise
+}
+
+async function init2(){
+  state.favorites = await loadFavorites();
+  render();
+}
+
+init();
+</script>
+</body>
+</html>
