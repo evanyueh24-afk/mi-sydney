@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #1b1712;
+  --paper: #f7efe1;
+  --paper-dim: #efe4ce;
+  --card: #fffcf6;
+  --red: #b23225;
+  --red-dark: #8b2419;
+  --jade: #2f6e5c;
+  --gold: #c79a3b;
+  --line: rgba(27, 23, 18, 0.12);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* Backdrop outside the app frame, matching the prototype. */
+  background: #ddd3be;
+  color: var(--ink);
+  font-family: var(--font-work-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hide scrollbars on horizontal rails (prototype behaviour). */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@layer components {
+  /* The red square "seal" mark — logo + rating badge motif (spec §9). */
+  .seal {
+    @apply flex items-center justify-center rounded-lg bg-red text-white font-serif font-black shadow-seal;
+    transform: rotate(-4deg);
+  }
+}
+
+/* Smooth active-press feedback on cards. */
+.press:active {
+  transform: scale(0.98);
+}
